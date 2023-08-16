@@ -50,7 +50,7 @@ class MessageAppApplicationTests {
     @Test
     @DirtiesContext
     void shouldCreateANewMessage() {
-        MyMessage newMessage = new MyMessage(null, "Hello", "a message here");
+        MyMessage newMessage = new MyMessage(null, "Hello", "a message here", "sarah1");
         ResponseEntity<Void> createResponse =
                 restTemplate.postForEntity("/messages", newMessage, Void.class);
         assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -123,20 +123,4 @@ class MessageAppApplicationTests {
         assertThat(titles).containsExactly("Hello", "Hi", "Ciao");
     }
 
-    @Test
-    void shouldCreateNewMessage() {
-        MyMessage newMyMessage = new MyMessage(null, "Moi", "This is fourth message");
-        ResponseEntity<Void> createResponse = restTemplate.postForEntity(("/messages"), newMyMessage, Void.class);
-        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-        URI locationOfNewMessage = createResponse.getHeaders().getLocation();
-        ResponseEntity<String> getResponse = restTemplate.getForEntity(locationOfNewMessage, String.class);
-        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
-        Number id = documentContext.read("$.id");
-        String title = documentContext.read("$.title");
-        assertThat(id).isNotNull();
-        assertThat(title).isEqualTo("Moi");
-    }
 }

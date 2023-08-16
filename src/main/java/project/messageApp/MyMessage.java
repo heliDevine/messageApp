@@ -7,5 +7,6 @@ import org.springframework.data.relational.core.mapping.Table;
 public record MyMessage (
         @Id Long id,
         String title,
-        String messagebody) {
+        String messagebody,
+        String author) {
 }

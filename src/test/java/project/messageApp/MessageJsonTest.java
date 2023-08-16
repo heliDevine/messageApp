@@ -25,9 +25,9 @@ public class MessageJsonTest {
         void setUp() {
             myMessages = Arrays.array(
 
-            new MyMessage(99L, "Hello", "this is the first message"),
-            new MyMessage(100L, "Hi", "this is the second message"),
-            new MyMessage(101L, "Ciao", "this is the third message"));
+            new MyMessage(99L, "Hello", "this is the first message", "sarah1"),
+            new MyMessage(100L, "Hi", "this is the second message", "sarah1"),
+            new MyMessage(101L, "Ciao", "this is the third message", "sarah1"));
 
 }
 
@@ -35,7 +35,7 @@ public class MessageJsonTest {
 
     @Test
     public void myMessageSerializationTest() throws IOException {
-        MyMessage myMessage = new MyMessage(99L, "Hello", "this is the first message");
+        MyMessage myMessage = new MyMessage(99L, "Hello", "this is the first message", "sarah1");
 
         assertThat(json.write(myMessage)).isStrictlyEqualToJson("single.json");
 
@@ -58,11 +58,13 @@ public class MessageJsonTest {
            {
                "id":99,
                "title":"Hello",
-               "messagebody": "this is the first message"
+               "messagebody": "this is the first message",
+               "author": "sarah1"
+               
            }
            """;
         assertThat(json.parse(expected))
-                .isEqualTo(new MyMessage(99L, "Hello", "this is the first message"));
+                .isEqualTo(new MyMessage(99L, "Hello", "this is the first message", "sarah1"));
         assertThat(json.parseObject(expected).id()).isEqualTo(99);
         assertThat(json.parseObject(expected).title()).isEqualTo("Hello");
         assertThat(json.parseObject(expected).messagebody()).isEqualTo("this is the first message");
@@ -79,17 +81,20 @@ public class MessageJsonTest {
                   {
                            "id": 99,
                            "title": "Hello",
-                           "messagebody": "this is the first message"
+                           "messagebody": "this is the first message",
+                           "author": "sarah1"
                          },
                            {
                              "id": 100,
                              "title": "Hi",
-                             "messagebody": "this is the second message"
+                             "messagebody": "this is the second message",
+                             "author": "sarah1"
                            },
                            {
                              "id": 101,
                              "title": "Ciao",
-                             "messagebody": "this is the third message"
+                             "messagebody": "this is the third message",
+                             "author": "sarah1"
                            }
                 ]
                 """;

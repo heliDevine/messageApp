@@ -1,4 +1,4 @@
-INSERT INTO MYMESSAGE(ID, TITLE, MESSAGEBODY) VALUES (99, 'Hello', 'this is the first message');
-INSERT INTO MYMESSAGE(ID, TITLE, MESSAGEBODY) VALUES (100, 'Hi', 'this is the second message');
-INSERT INTO MYMESSAGE(ID, TITLE, MESSAGEBODY) VALUES (101, 'Ciao', 'this is the third message');
+INSERT INTO MYMESSAGE(ID, TITLE, MESSAGEBODY, AUTHOR) VALUES (99, 'Hello', 'this is the first message', 'sarah1');
+INSERT INTO MYMESSAGE(ID, TITLE, MESSAGEBODY, AUTHOR) VALUES (100, 'Hi', 'this is the second message', 'sarah1');
+INSERT INTO MYMESSAGE(ID, TITLE, MESSAGEBODY, AUTHOR) VALUES (101, 'Ciao', 'this is the third message', 'sarah1');
 
