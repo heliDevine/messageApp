@@ -23,7 +23,9 @@ class MessageAppApplicationTests {
 
     @Test
     void shouldReturnAMessageWhenDataIsSaved() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/messages/99", String.class);
+        ResponseEntity<String> response = restTemplate
+                .withBasicAuth("sarah1", "abc123")
+                .getForEntity("/messages/99", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         DocumentContext documentContext = JsonPath.parse(response.getBody());
@@ -37,11 +39,14 @@ class MessageAppApplicationTests {
 
         String body = documentContext.read("$.messagebody");
         assertThat(body).isEqualTo("this is the first message");
+
     }
 
     @Test
     void shouldNotReturnAMessageWithAnUnknownId() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/messages/1000", String.class);
+        ResponseEntity<String> response = restTemplate
+                .withBasicAuth("sarah1", "abc123")
+                .getForEntity("/messages/1000", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).isBlank();
@@ -52,11 +57,15 @@ class MessageAppApplicationTests {
     void shouldCreateANewMessage() {
         MyMessage newMessage = new MyMessage(null, "Hello", "a message here", "sarah1");
         ResponseEntity<Void> createResponse =
-                restTemplate.postForEntity("/messages", newMessage, Void.class);
+                restTemplate
+                        .withBasicAuth("sarah1", "abc123")
+                        .postForEntity("/messages", newMessage, Void.class);
         assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         URI locationOfNewCashCard = createResponse.getHeaders().getLocation();
-        ResponseEntity<String> getResponse = restTemplate.getForEntity(locationOfNewCashCard, String.class);
+        ResponseEntity<String> getResponse = restTemplate
+                .withBasicAuth("sarah1", "abc123")
+                .getForEntity(locationOfNewCashCard, String.class);
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
 
@@ -70,7 +79,9 @@ class MessageAppApplicationTests {
 
     @Test
     void shouldReturnAllMessagesWhenListIsRequested() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/messages", String.class);
+        ResponseEntity<String> response = restTemplate
+                .withBasicAuth("sarah1", "abc123")
+                .getForEntity("/messages", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         DocumentContext documentContext = JsonPath.parse(response.getBody());
@@ -87,7 +98,9 @@ class MessageAppApplicationTests {
 
     @Test
     void shouldReturnAPageOfMessages() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/messages?page=0&size=1", String.class);
+        ResponseEntity<String> response = restTemplate
+                .withBasicAuth("sarah1", "abc123")
+                .getForEntity("/messages?page=0&size=1", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -98,7 +111,9 @@ class MessageAppApplicationTests {
 
     @Test
     void shouldReturnASortedPageOfMessages() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/messages?page=0&size=1&sort=title,desc", String.class);
+        ResponseEntity<String> response = restTemplate
+                .withBasicAuth("sarah1", "abc123")
+                .getForEntity("/messages?page=0&size=1&sort=title,desc", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         DocumentContext documentContext = JsonPath.parse(response.getBody());
@@ -112,7 +127,9 @@ class MessageAppApplicationTests {
 
     @Test
     void shouldReturnASortedPageOfMessagesWithNoParametersAndUseDefaultValues() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/messages", String.class);
+        ResponseEntity<String> response = restTemplate
+                .withBasicAuth("sarah1", "abc123")
+                .getForEntity("/messages", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         DocumentContext documentContext = JsonPath.parse(response.getBody());
@@ -122,5 +139,28 @@ class MessageAppApplicationTests {
         JSONArray titles = documentContext.read("$..title");
         assertThat(titles).containsExactly("Hello", "Hi", "Ciao");
     }
+
+    @Test
+    void shouldNotReturnAMessageWhenUsingBadCredentials() {
+        ResponseEntity<String> response = restTemplate
+                .withBasicAuth("BAD-USER", "abc123")
+                .getForEntity("/messages/99", String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+
+        response = restTemplate
+                .withBasicAuth("sarah1", "BAD-PASSWORD")
+                .getForEntity("/messages/99", String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    void shouldRejectUsersWhoAreNotAuthors() {
+        ResponseEntity<String> response = restTemplate
+                .withBasicAuth("hank", "qrs456")
+                .getForEntity("/messages/99", String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+
 
 }
